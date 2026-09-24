@@ -104,7 +104,7 @@ def print_banner():
  █▀▓ ▓▀  █▀▓ ▓▀▄  ▓░      █ ▓ █  ▓ ▓░  █ ▓ ▓░  ▓▀▄ ▓▀  ▓▀▄
  ▀ ▀ ▀▀▀ ▀ ▀ ▀ ▀  ▀       ▀▀▀ ▀  ▀ ▀▀▀ ▀▀▀ ▀▀▀ ▀ ▀ ▀▀▀ ▀ ▀
 """
-    banner = f"{Colors.GREEN}{Colors.BOLD}{art}{Colors.RESET}{Colors.DIM}              [  BEDROCK ACHIEVEMENT REACTIVATOR  ]{Colors.RESET}\n{Colors.DIM}              Credits: @Heartzin  |  t.me/Heartzin{Colors.RESET}\n"
+    banner = f"{Colors.GREEN}{Colors.BOLD}{art}{Colors.RESET}{Colors.DIM}              [  BEDROCK ACHIEVEMENT REACTIVATOR  ]{Colors.RESET}\n{Colors.DIM}              Credits: @Heartzin  |  t.me/Heartzin  |  github.com/Hearttsu63{Colors.RESET}\n"
     print(banner)
 
 def patch_level_dat(level_path: pathlib.Path, remove_packs=False):
@@ -411,7 +411,7 @@ def main():
             if any(mundo_info(w)[2]>0 for w in targets):
                 print(f"{Colors.YELLOW}     Tip: if still blocked, run again and choose to remove packs.{Colors.RESET}")
         print(f"{Colors.GREEN}{'═'*62}{Colors.RESET}")
-        print(f"{Colors.DIM}  Made with <3 by @Heartzin -- t.me/Heartzin{Colors.RESET}")
+        print(f"{Colors.DIM}  Made with <3 by @Heartzin -- t.me/Heartzin | github.com/Hearttsu63{Colors.RESET}")
         nxt=input(f"\n{Colors.BOLD}  Press Enter to return to menu (or type quit) > {Colors.RESET}").strip().lower()
         if nxt in ("q","quit","exit"):
             print(f"{Colors.GREEN}  Bye!{Colors.RESET}"); break
