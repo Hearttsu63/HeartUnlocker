@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "heartzin-unlocker"
-version = "2.0.0"
+version = "2.1.0"
 description = "Bedrock Achievement Reactivator by @Heartzin"
 readme = "README.md"
 requires-python = ">=3.8"

@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
-# HEARTZIN UNLOCKER - Bedrock Achievement Reactivator
+# HEARTZIN UNLOCKER - Bedrock Achievement Reactivator | CYBERPUNK GREEN EDITION
 # Credits: @Heartzin | https://t.me/Heartzin
 # Based on 058f9cf1/minecraft_bedrock_reenable_achievements
-import pathlib, struct, sys, json, shutil, os
+import pathlib, struct, sys, json, shutil, os, time, random
 from amulet_nbt import load, TAG_Byte, TAG_Int
+
+if sys.platform == 'win32':
+    try:
+        os.system('chcp 65001 >nul 2>&1')
+        sys.stdout.reconfigure(encoding='utf-8')
+    except: pass
 
 WORLDS_ROOT = pathlib.Path.home() / "AppData/Roaming/Minecraft Bedrock/Users"
 
@@ -17,34 +23,61 @@ FLAGS_BYTE = [
     "isWorldTemplateOptionLocked",
 ]
 
-# clean visual (no ANSI to avoid console bugs)
-def c(k, t): return t
+class Colors:
+    CYAN = '\033[96m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    MAGENTA = '\033[95m'
+    WHITE = '\033[97m'
+    DIM = '\033[2m'
+    BOLD = '\033[1m'
+    RESET = '\033[0m'
+    BG_GREEN = '\033[42m'
+    BG_BLACK = '\033[40m'
 
-def header():
-    print(r"  _   _ _____   _    ____ _____")
-    print(r" | | | | ____| / \  |  _ \_   _|")
-    print(r" | |_| |  _|  / _ \ | |_) || |")
-    print(r" |  _  | |___ / ___ \|  _ < | |")
-    print(r" |_| |_|_____/_/   \_\_| \_\|_|")
-    print()
-    print("  -- BEDROCK ACHIEVEMENT REACTIVATOR --")
-    print("  Credits: @Heartzin  |  t.me/Heartzin  |  base: github.com/058f9cf1")
-    print("  " + "-"*58)
-    print()
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+def loading_animation(msg, duration=0.6):
+    frames = ["⠋","⠙","⠹","⠸","⠼","⠴","⠦","⠧","⠇","⠏"]
+    end = time.time() + duration
+    i=0
+    while time.time() < end:
+        print(f"\r{Colors.GREEN}{frames[i%len(frames)]}{Colors.RESET} {msg}", end="")
+        time.sleep(0.08); i+=1
+    print(f"\r{Colors.GREEN}[✓]{Colors.RESET} {msg} {Colors.GREEN}DONE{Colors.RESET}  ")
+
+def cyber_divider():
+    print(f"{Colors.GREEN}{'═'*62}{Colors.RESET}")
+
+def cyber_box(text, color=Colors.GREEN):
+    print(f"{color}╔{'═'*(len(text)+4)}╗{Colors.RESET}")
+    print(f"{color}║  {Colors.BOLD}{text}{Colors.RESET}{color}  ║{Colors.RESET}")
+    print(f"{color}╚{'═'*(len(text)+4)}╝{Colors.RESET}")
+
+def print_banner():
+    art = r"""
+  _   _ _____   _    ____ _____  _   _ _   _ _     ___   ____ _  __ _____ ____
+ | | | | ____| / \  |  _ \_   _|| | | | \ | | |   / _ \ / ___| |/ /| ____|  _ \
+ | |_| |  _|  / _ \ | | | || |  | | | |  \| | |  | | | | |   | ' / |  _| | |_) |
+ |  _  | |___ / ___ \| |_| || |  | |_| | |\  | |__| |_| | |___| . \ | |___|  _ <
+ |_| |_|_____/_/   \_|____||_|   \___/|_| \_|_____\___/ \____|_|\_\_____|_| \_\
+"""
+    banner = f"{Colors.GREEN}{Colors.BOLD}{art}{Colors.RESET}{Colors.GREEN}                    ◆  CYBERPUNK GREEN EDITION  ◆{Colors.RESET}\n{Colors.DIM}              [  BEDROCK ACHIEVEMENT REACTIVATOR  ]{Colors.RESET}\n{Colors.DIM}              Credits: @Heartzin  |  t.me/Heartzin{Colors.RESET}\n"
+    print(banner)
 
 def patch_level_dat(level_path: pathlib.Path, remove_packs=False):
     data = level_path.read_bytes()
     if len(data) < 8:
-        print(f"  [ERROR] level.dat too small: {level_path}")
+        print(f"{Colors.RED}  [ERROR] level.dat too small: {level_path}{Colors.RESET}")
         return False
     ver, length = struct.unpack("<ii", data[:8])
     nbt_bytes = data[8:8+length]
     extra = data[8+length:]
-
     tag = load(nbt_bytes, little_endian=True, compressed=False)
     root = tag.tag
-    changed = []
-
+    changed=[]
     if "GameType" in root and int(root["GameType"]) != 0:
         root["GameType"] = TAG_Int(0)
         changed.append("GameType->Survival")
@@ -53,43 +86,38 @@ def patch_level_dat(level_path: pathlib.Path, remove_packs=False):
             root[k] = TAG_Byte(0)
             changed.append(f"{k}->0")
     if "experiments" in root:
-        ex = root["experiments"]
-        for ek in ["experiments_ever_used", "saved_with_toggled_experiments"]:
-            if ek in ex and int(ex[ek]) != 0:
-                ex[ek] = TAG_Byte(0)
+        ex=root["experiments"]
+        for ek in ["experiments_ever_used","saved_with_toggled_experiments"]:
+            if ek in ex and int(ex[ek])!=0:
+                ex[ek]=TAG_Byte(0)
                 changed.append(f"experiments.{ek}->0")
-
     if not changed and not remove_packs:
-        print("  [OK] already clean (nothing to change)")
+        print(f"{Colors.GREEN}  [OK] already clean{Colors.RESET}")
         return True
-
-    bak = level_path.with_name("level.dat.bak")
+    bak=level_path.with_name("level.dat.bak")
     if not bak.exists():
-        shutil.copy2(level_path, bak)
-        print(f"  backup: {bak.name}")
-
-    new_nbt = tag.save_to(little_endian=True, compressed=False)
-    out = struct.pack("<ii", ver, len(new_nbt)) + new_nbt + extra
+        shutil.copy2(level_path,bak)
+        print(f"{Colors.DIM}  backup: {bak.name}{Colors.RESET}")
+    new_nbt=tag.save_to(little_endian=True, compressed=False)
+    out=struct.pack("<ii",ver,len(new_nbt))+new_nbt+extra
     level_path.write_bytes(out)
     if changed:
-        print(f"  [OK] flags: {', '.join(changed)}")
+        print(f"{Colors.GREEN}  [OK] flags: {', '.join(changed)}{Colors.RESET}")
     else:
-        print("  [OK] flags already ok")
-
+        print(f"{Colors.GREEN}  [OK] flags already ok{Colors.RESET}")
     if remove_packs:
-        wbp = level_path.parent / "world_behavior_packs.json"
+        wbp=level_path.parent/"world_behavior_packs.json"
         if wbp.exists():
-            try:
-                arr = json.loads(wbp.read_text(encoding="utf-8").strip() or "[]")
-            except: arr = []
+            try: arr=json.loads(wbp.read_text(encoding="utf-8").strip() or "[]")
+            except: arr=[]
             if arr:
-                bak2 = wbp.with_name("world_behavior_packs.json.bak")
-                if not bak2.exists(): shutil.copy2(wbp, bak2)
-                wbp.write_text("[]", encoding="utf-8")
-                print(f"  * world_behavior_packs.json cleared ({len(arr)} pack(s) removed)")
+                bak2=wbp.with_name("world_behavior_packs.json.bak")
+                if not bak2.exists(): shutil.copy2(wbp,bak2)
+                wbp.write_text("[]",encoding="utf-8")
+                print(f"{Colors.YELLOW}  * world_behavior_packs.json cleared ({len(arr)} pack(s) removed){Colors.RESET}")
             else:
-                print("  world_behavior_packs.json already empty")
-        old = level_path.parent / "level.dat_old"
+                print(f"{Colors.DIM}  world_behavior_packs.json already empty{Colors.RESET}")
+        old=level_path.parent/"level.dat_old"
         if old.exists():
             try: old.unlink()
             except: pass
@@ -100,7 +128,7 @@ def listar_mundos():
     if not WORLDS_ROOT.exists(): return []
     for user in WORLDS_ROOT.iterdir():
         if not user.is_dir(): continue
-        mp = user / "games/com.mojang/minecraftWorlds"
+        mp=user/"games/com.mojang/minecraftWorlds"
         if not mp.is_dir(): continue
         for w in mp.iterdir():
             if w.is_dir() and (w/"level.dat").exists():
@@ -109,7 +137,7 @@ def listar_mundos():
     return mundos
 
 def mundo_info(w: pathlib.Path):
-    ln = (w/"levelname.txt").read_text(encoding="utf-8").strip() if (w/"levelname.txt").exists() else w.name
+    ln=(w/"levelname.txt").read_text(encoding="utf-8").strip() if (w/"levelname.txt").exists() else w.name
     try:
         data=(w/"level.dat").read_bytes()
         ver,length=struct.unpack("<ii",data[:8])
@@ -118,89 +146,116 @@ def mundo_info(w: pathlib.Path):
         hb=int(root.get("hasBeenLoadedInCreative",0))
         ce=int(root.get("cheatsEnabled",0))
         cmd=int(root.get("commandsEnabled",0))
-        blocked = (hb==1 or ce==1 or cmd==1)
+        blocked=(hb==1 or ce==1 or cmd==1)
     except: blocked=None
     try:
         j=json.loads((w/"world_behavior_packs.json").read_text(encoding="utf-8"))
         packs=len(j) if isinstance(j,list) else 0
     except: packs=0
-    return ln, blocked, packs
+    return ln,blocked,packs
 
 def main():
-    header()
-    force_remove = "--remove-packs" in sys.argv or "--limpar-packs" in sys.argv or "--limpar" in sys.argv
-    args = [a for a in sys.argv[1:] if not a.startswith("--")]
-
-    targets=[]
+    # CLI batch mode: if args given, do single run and exit (drag & drop support)
+    force_remove="--remove-packs" in sys.argv or "--limpar-packs" in sys.argv or "--limpar" in sys.argv
+    args=[a for a in sys.argv[1:] if not a.startswith("--")]
     if args:
+        targets=[]
         for a in args:
             p=pathlib.Path(a)
             if p.is_file() and p.name=="level.dat": targets.append(p.parent)
             elif p.is_dir() and (p/"level.dat").exists(): targets.append(p)
-            else: print(f"Ignored: {a}")
-        remove = force_remove
-    else:
+            else: print(f"{Colors.RED}Ignored: {a}{Colors.RESET}")
+        if not targets:
+            print(f"{Colors.RED}Nothing to do.{Colors.RESET}"); sys.exit(1)
+        for w in targets:
+            print(f"{Colors.GREEN} -> {w.name}{Colors.RESET}")
+            patch_level_dat(w/"level.dat", remove_packs=force_remove)
+        print(f"\n{Colors.GREEN}Done!{Colors.RESET}")
+        return
+
+    # Interactive cyberpunk menu loop
+    while True:
+        clear_screen()
+        print_banner()
+        cyber_divider()
         mundos=listar_mundos()
         if not mundos:
-            print("  No worlds found. Create a world first.")
-            input("  Press Enter to exit..."); sys.exit(1)
+            print(f"{Colors.RED}  No worlds found. Create a world first.{Colors.RESET}")
+            input("  Press Enter to exit..."); return
 
-        print("  YOUR WORLDS:\n")
-        print(f"  {'#':<3} {'Name':<28} {'Status':<12} {'Packs'}")
-        print("  " + "-"*56)
+        print(f"{Colors.BOLD}  YOUR WORLDS:{Colors.RESET}\n")
+        print(f"{Colors.DIM}  {'#':<3} {'Name':<28} {'Status':<12} {'Packs'}{Colors.RESET}")
+        print(f"{Colors.GREEN}  {'-'*56}{Colors.RESET}")
         for i,w in enumerate(mundos,1):
-            ln, blocked, packs = mundo_info(w)
-            status = "* BLOCKED" if blocked else "* OK" if blocked==False else "* ?"
-            packs_s = f"{packs} pack(s)" if packs else "-"
-            print(f"  {str(i).rjust(2)}  {ln[:28].ljust(28)} {status.ljust(12)} {packs_s}")
-        print()
-        try:
-            sel=int(input(f"  Choose world (1-{len(mundos)}) or 0 for ALL > ").strip() or "0")
-        except: sel=0
-        if sel==0: targets=mundos
-        elif 1 <= sel <= len(mundos): targets=[mundos[sel-1]]
-        else: print("  Invalid selection"); sys.exit(1)
+            ln,blocked,packs=mundo_info(w)
+            if blocked: status=f"{Colors.RED}* BLOCKED{Colors.RESET}"
+            elif blocked==False: status=f"{Colors.GREEN}* OK{Colors.RESET}"
+            else: status=f"{Colors.DIM}* ?{Colors.RESET}"
+            packs_s=f"{Colors.YELLOW}{packs} pack(s){Colors.RESET}" if packs else f"{Colors.DIM}-{Colors.RESET}"
+            # strip ANSI for length calc, but print with colors
+            print(f"  {Colors.GREEN}{str(i).rjust(2)}{Colors.RESET}  {ln[:28].ljust(28)} {status}  {packs_s}")
 
+        print(f"\n{Colors.DIM}  [0] ALL  |  [Q] Quit{Colors.RESET}")
+        cyber_divider()
+        sel=input(f"{Colors.BOLD}{Colors.GREEN}  Choose > {Colors.RESET}").strip().lower()
+        if sel in ("q","quit","exit"):
+            print(f"{Colors.GREEN}\n  Bye! Made with <3 by @Heartzin{Colors.RESET}")
+            break
+        try:
+            sel_int=int(sel)
+        except:
+            print(f"{Colors.RED}  Invalid input{Colors.RESET}"); time.sleep(1); continue
+        if sel_int==0:
+            targets=mundos
+        elif 1 <= sel_int <= len(mundos):
+            targets=[mundos[sel_int-1]]
+        else:
+            print(f"{Colors.RED}  Invalid selection{Colors.RESET}"); time.sleep(1); continue
+
+        # detect packs
         if force_remove:
             remove=True
         else:
-            has_packs = any(mundo_info(w)[2]>0 for w in targets)
+            has_packs=any(mundo_info(w)[2]>0 for w in targets)
             if has_packs:
-                print()
-                print("  [!] Some worlds have Behavior Pack installed.")
-                print("     Even after reactivation, keeping packs still blocks achievements.")
-                print("     Remove packs from world? (Bar addon will be removed, but achievements return)")
-                r=input("  Remove packs? [y/N] > ").strip().lower()
-                remove = r in ("y","yes")
+                print(f"\n{Colors.YELLOW}  [!] Some worlds have Behavior Pack installed.{Colors.RESET}")
+                print(f"{Colors.DIM}     Keeping packs still blocks achievements.{Colors.RESET}")
+                r=input(f"{Colors.BOLD}  Remove packs? [y/N] > {Colors.RESET}").strip().lower()
+                if r in ("q","quit","exit"):
+                    continue
+                remove=r in ("y","yes")
                 if remove:
-                    print("  -> packs will be removed together with reactivation")
+                    print(f"{Colors.YELLOW}  -> packs will be removed{Colors.RESET}")
                 else:
-                    print("  -> packs kept (only flags will be reset)")
+                    print(f"{Colors.DIM}  -> packs kept (only flags){Colors.RESET}")
             else:
                 remove=False
 
+        print(f"\n{Colors.RED}  [!] Close Minecraft before continuing!{Colors.RESET}")
+        cont=input(f"{Colors.DIM}  Press Enter to reactivate (or type quit to cancel) > {Colors.RESET}").strip().lower()
+        if cont in ("q","quit","exit"):
+            continue
+
         print()
-        print("  [!] Close Minecraft before continuing!")
-        input("  Press Enter to reactivate...")
+        cyber_box("REACTIVATING", Colors.GREEN)
+        loading_animation("Patching level.dat", 0.7)
+        for w in targets:
+            ln,_,_=mundo_info(w)
+            print(f"{Colors.GREEN}  -> {w.name}{Colors.RESET}  \"{ln}\"")
+            patch_level_dat(w/"level.dat", remove_packs=remove)
 
-    if not targets:
-        print("  Nothing selected."); sys.exit(1)
-
-    print()
-    for w in targets:
-        ln,_,_=mundo_info(w)
-        print(f"  -> {w.name}  \"{ln}\"")
-        patch_level_dat(w/"level.dat", remove_packs=remove)
-
-    print()
-    print("  == [OK] Done! Open the world and achievements will count again. ==")
-    if remove:
-        print("     Packs removed. Reinstall Bar addon when you need Creative again.")
-    else:
-        if any(mundo_info(w)[2]>0 for w in targets):
-            print("     Tip: if still blocked, run again and choose to remove packs.")
-    print("  --  Made with <3 by @Heartzin --  t.me/Heartzin  --")
-    input("  Press Enter to exit...")
+        print(f"\n{Colors.GREEN}{'═'*62}{Colors.RESET}")
+        print(f"{Colors.BOLD}{Colors.GREEN}  [OK] Done! Open the world and achievements will count again.{Colors.RESET}")
+        if remove:
+            print(f"{Colors.DIM}     Packs removed. Reinstall Bar addon when you need Creative again.{Colors.RESET}")
+        else:
+            if any(mundo_info(w)[2]>0 for w in targets):
+                print(f"{Colors.YELLOW}     Tip: if still blocked, run again and choose to remove packs.{Colors.RESET}")
+        print(f"{Colors.GREEN}{'═'*62}{Colors.RESET}")
+        print(f"{Colors.DIM}  Made with <3 by @Heartzin -- t.me/Heartzin{Colors.RESET}")
+        nxt=input(f"\n{Colors.BOLD}  Press Enter to return to menu (or type quit) > {Colors.RESET}").strip().lower()
+        if nxt in ("q","quit","exit"):
+            print(f"{Colors.GREEN}  Bye!{Colors.RESET}"); break
 
 if __name__=="__main__":
     main()
