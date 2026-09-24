@@ -39,13 +39,6 @@ py -3 -m pip install git+https://github.com/Hearttsu63/HeartzinUnlocker.git
 heart-unlocker
 # or
 py -3 -m heart_unlocker
-# legacy
-py -3 -m reativar_conquistas
-
-# force remove packs:
-heart-unlocker --remove-packs
-# single world / drag & drop:
-heart-unlocker "C:\...\minecraftWorlds\My World"
 ```
 
 ### Option B — EXE (no Python needed)
@@ -53,7 +46,25 @@ heart-unlocker "C:\...\minecraftWorlds\My World"
 1. Close Minecraft completely
 2. Double-click `dist\HeartUnlocker.exe`
 3. Choose world number (`0` for all) → if packs detected, choose `y` to remove them → Enter
-4. Or choose `[M] Manual path` and paste a world from another drive, e.g. `D:\Games\Minecraft\MyWorld` or drag & drop a `.mcworld` onto the EXE
+
+## Secondary Commands
+
+```powershell
+# force remove packs without asking
+heart-unlocker --remove-packs
+# also works with old flag
+heart-unlocker --limpar-packs
+
+# single world / drag & drop (any drive, .mcworld, .zip, folder, level.dat)
+heart-unlocker "D:\Games\Minecraft\MyWorld"
+heart-unlocker "E:\backup.mcworld"
+heart-unlocker "C:\...\minecraftWorlds\My World\level.dat"
+
+# batch: drag multiple files onto the EXE or pass multiple paths
+heart-unlocker "C:\world1" "D:\world2.mcworld"
+
+# manual path inside menu: choose [M] and paste any path above
+```
 
 ## How it works
 
