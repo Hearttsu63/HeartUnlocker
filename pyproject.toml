@@ -22,4 +22,4 @@ Homepage = "https://github.com/Hearttsu63/HeartUnlocker"
 Repository = "https://github.com/Hearttsu63/HeartUnlocker"
 
 [tool.setuptools]
-py-modules = ["reativar_conquistas", "heart_unlocker"]
+py-modules = ["heart_unlocker"]
