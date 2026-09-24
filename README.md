@@ -28,21 +28,28 @@ Based on [058f9cf1/minecraft_bedrock_reenable_achievements](https://github.com/0
 
 ## Quick Start
 
-### Option A — EXE (recommended)
+### Option A — Python (one-liner via GitHub)
+
+```powershell
+# install directly from GitHub
+py -3 -m pip install git+https://github.com/Hearttsu63/HeartzinUnlocker.git
+
+# run
+heartzin-unlocker
+# or
+py -3 -m reativar_conquistas
+
+# force remove packs:
+py -3 -m heartzin_unlocker --remove-packs
+# single world / drag & drop:
+py -3 reativar_conquistas.py "C:\...\minecraftWorlds\My World"
+```
+
+### Option B — EXE (no Python needed)
 
 1. Close Minecraft completely
 2. Double-click `dist\HeartzinUnlocker.exe`
 3. Choose world number (`0` for all) → if packs detected, choose `y` to remove them → Enter
-
-### Option B — Python
-
-```powershell
-py -3 reativar_conquistas.py
-# force remove packs:
-py -3 reativar_conquistas.py --remove-packs
-# single world / drag & drop:
-py -3 reativar_conquistas.py "C:\...\minecraftWorlds\My World"
-```
 
 ## How it works
 
