@@ -47,6 +47,19 @@ py -3 -m heart_unlocker
 2. Double-click `dist\HeartUnlocker.exe`
 3. Choose world number (`0` for all) → if packs detected, choose `y` to remove them → Enter
 
+### Option C — Termux (Android)
+
+```bash
+pkg update && pkg install python git -y
+pip install amulet-nbt amulet-core
+pip install git+https://github.com/Hearttsu63/HeartzinUnlocker.git
+termux-setup-storage
+heart-unlocker
+# then choose [M] Manual path and paste:
+# /storage/emulated/0/games/com.mojang/minecraftWorlds/My World
+# or /storage/emulated/0/Android/data/com.mojang.minecraftpe/files/games/com.mojang/minecraftWorlds/...
+```
+
 ## Secondary Commands
 
 ```powershell
