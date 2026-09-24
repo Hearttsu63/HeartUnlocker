@@ -2,7 +2,7 @@
 # HEARTZIN UNLOCKER - Bedrock Achievement Reactivator | CYBERPUNK GREEN EDITION
 # Credits: @Heartzin | https://t.me/Heartzin
 # Based on 058f9cf1/minecraft_bedrock_reenable_achievements
-import pathlib, struct, sys, json, shutil, os, time, random
+import pathlib, struct, sys, json, shutil, os, time, random, zipfile, tempfile
 from amulet_nbt import load, TAG_Byte, TAG_Int
 
 if sys.platform == 'win32':
@@ -155,22 +155,80 @@ def mundo_info(w: pathlib.Path):
     except: packs=0
     return ln,blocked,packs
 
+def handle_zip_file(zip_path: pathlib.Path, remove_packs=False):
+    if not zipfile.is_zipfile(zip_path):
+        print(f"{Colors.RED}  Not a valid zip/mcworld: {zip_path}{Colors.RESET}")
+        return False
+    tmpdir = pathlib.Path(tempfile.gettempdir()) / "heartzin_unlock"
+    if tmpdir.exists(): shutil.rmtree(tmpdir)
+    tmpdir.mkdir(parents=True, exist_ok=True)
+    try:
+        with zipfile.ZipFile(zip_path, 'r') as z:
+            z.extractall(tmpdir)
+        # find level.dat inside tmpdir
+        level_dat = None
+        for p in tmpdir.rglob("level.dat"):
+            level_dat = p
+            break
+        if not level_dat or not level_dat.exists():
+            print(f"{Colors.RED}  No level.dat found in archive{Colors.RESET}")
+            return False
+        world_dir = level_dat.parent
+        print(f"{Colors.GREEN}  -> Patching {world_dir.name} inside archive{Colors.RESET}")
+        patch_level_dat(level_dat, remove_packs=remove_packs)
+        # also handle world_behavior_packs.json if remove_packs
+        if remove_packs:
+            wbp = world_dir / "world_behavior_packs.json"
+            if wbp.exists():
+                try:
+                    arr=json.loads(wbp.read_text(encoding="utf-8").strip() or "[]")
+                except: arr=[]
+                if arr:
+                    wbp.write_text("[]", encoding="utf-8")
+        # recompress
+        # mcworld is just zip with .mcworld extension
+        # create new zip in temp then move
+        tmp_zip = zip_path.with_suffix(".tmp")
+        with zipfile.ZipFile(tmp_zip, 'w', zipfile.ZIP_DEFLATED) as z:
+            for f in tmpdir.rglob("*"):
+                if f.is_file():
+                    z.write(f, f.relative_to(tmpdir))
+        shutil.move(str(tmp_zip), str(zip_path))
+        print(f"{Colors.GREEN}  [OK] Archive updated: {zip_path}{Colors.RESET}")
+        return True
+    finally:
+        if tmpdir.exists(): shutil.rmtree(tmpdir)
+
 def main():
-    # CLI batch mode: if args given, do single run and exit (drag & drop support)
+    # CLI batch mode: if args given, do single run and exit (drag & drop support - any drive, .mcworld, .zip, folder, level.dat)
     force_remove="--remove-packs" in sys.argv or "--limpar-packs" in sys.argv or "--limpar" in sys.argv
     args=[a for a in sys.argv[1:] if not a.startswith("--")]
     if args:
-        targets=[]
+        has_work=False
         for a in args:
-            p=pathlib.Path(a)
-            if p.is_file() and p.name=="level.dat": targets.append(p.parent)
-            elif p.is_dir() and (p/"level.dat").exists(): targets.append(p)
-            else: print(f"{Colors.RED}Ignored: {a}{Colors.RESET}")
-        if not targets:
+            p=pathlib.Path(a.strip().strip('"').strip("'"))
+            if p.is_file() and p.suffix.lower() in (".mcworld",".zip") and zipfile.is_zipfile(p):
+                handle_zip_file(p, remove_packs=force_remove)
+                has_work=True
+            elif p.is_file() and p.name=="level.dat":
+                patch_level_dat(p, remove_packs=force_remove)
+                has_work=True
+            elif p.is_dir() and (p/"level.dat").exists():
+                patch_level_dat(p/"level.dat", remove_packs=force_remove)
+                has_work=True
+            elif p.is_file() and p.name=="level.dat":
+                patch_level_dat(p, remove_packs=force_remove)
+                has_work=True
+            else:
+                # try as world dir passed as level.dat parent
+                pp=pathlib.Path(a)
+                if pp.is_dir() and (pp/"level.dat").exists():
+                    patch_level_dat(pp/"level.dat", remove_packs=force_remove)
+                    has_work=True
+                else:
+                    print(f"{Colors.RED}Ignored: {a}{Colors.RESET}")
+        if not has_work:
             print(f"{Colors.RED}Nothing to do.{Colors.RESET}"); sys.exit(1)
-        for w in targets:
-            print(f"{Colors.GREEN} -> {w.name}{Colors.RESET}")
-            patch_level_dat(w/"level.dat", remove_packs=force_remove)
         print(f"\n{Colors.GREEN}Done!{Colors.RESET}")
         return
 
@@ -196,22 +254,52 @@ def main():
             # strip ANSI for length calc, but print with colors
             print(f"  {Colors.GREEN}{str(i).rjust(2)}{Colors.RESET}  {ln[:28].ljust(28)} {status}  {packs_s}")
 
-        print(f"\n{Colors.DIM}  [0] ALL  |  [Q] Quit{Colors.RESET}")
+        print(f"\n{Colors.DIM}  [0] ALL  |  [M] Manual path (any drive / .mcworld / .zip)  |  [Q] Quit{Colors.RESET}")
         cyber_divider()
         sel=input(f"{Colors.BOLD}{Colors.GREEN}  Choose > {Colors.RESET}").strip().lower()
         if sel in ("q","quit","exit"):
             print(f"{Colors.GREEN}\n  Bye! Made with <3 by @Heartzin{Colors.RESET}")
             break
-        try:
-            sel_int=int(sel)
-        except:
-            print(f"{Colors.RED}  Invalid input{Colors.RESET}"); time.sleep(1); continue
-        if sel_int==0:
-            targets=mundos
-        elif 1 <= sel_int <= len(mundos):
-            targets=[mundos[sel_int-1]]
+        # Manual path - send world file from any drive
+        if sel in ("m","manual"):
+            manual=input(f"{Colors.BOLD}  Paste world path (folder, level.dat, .mcworld, .zip) > {Colors.RESET}").strip().strip('"').strip("'")
+            if not manual or manual.lower() in ("q","quit","exit"):
+                continue
+            p=pathlib.Path(manual)
+            # zip / mcworld
+            if p.is_file() and p.suffix.lower() in (".mcworld",".zip") and zipfile.is_zipfile(p):
+                # ask about packs for zip
+                remove = force_remove
+                if not remove:
+                    r=input(f"{Colors.BOLD}  Remove packs from archive? [y/N] > {Colors.RESET}").strip().lower()
+                    remove=r in ("y","yes")
+                cyber_box("REACTIVATING ARCHIVE", Colors.GREEN)
+                loading_animation("Patching archive", 0.7)
+                handle_zip_file(p, remove_packs=remove)
+                print(f"\n{Colors.GREEN}{'═'*62}{Colors.RESET}")
+                print(f"{Colors.BOLD}{Colors.GREEN}  [OK] Archive done!{Colors.RESET}")
+                print(f"{Colors.GREEN}{'═'*62}{Colors.RESET}")
+                nxt=input(f"\n{Colors.BOLD}  Press Enter to return to menu (or type quit) > {Colors.RESET}").strip().lower()
+                if nxt in ("q","quit","exit"):
+                    print(f"{Colors.GREEN}  Bye!{Colors.RESET}"); break
+                continue
+            elif p.is_file() and p.name=="level.dat":
+                targets=[p.parent]
+            elif p.is_dir() and (p/"level.dat").exists():
+                targets=[p]
+            else:
+                print(f"{Colors.RED}  Invalid path. Use a world folder, level.dat or .mcworld/.zip{Colors.RESET}"); time.sleep(1.5); continue
         else:
-            print(f"{Colors.RED}  Invalid selection{Colors.RESET}"); time.sleep(1); continue
+            try:
+                sel_int=int(sel)
+            except:
+                print(f"{Colors.RED}  Invalid input{Colors.RESET}"); time.sleep(1); continue
+            if sel_int==0:
+                targets=mundos
+            elif 1 <= sel_int <= len(mundos):
+                targets=[mundos[sel_int-1]]
+            else:
+                print(f"{Colors.RED}  Invalid selection{Colors.RESET}"); time.sleep(1); continue
 
         # detect packs
         if force_remove:

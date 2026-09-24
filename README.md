@@ -13,7 +13,8 @@ Based on [058f9cf1/minecraft_bedrock_reenable_achievements](https://github.com/0
 
 - **One-click reactivation** — resets `hasBeenLoadedInCreative`, `cheatsEnabled`, `commandsEnabled`, `hasLockedBehaviorPack`, `hasLockedResourcePack`, `isFromLockedTemplate` and `GameType` to Survival
 - **Smart pack handling** — detects `world_behavior_packs.json`; asks if you want to keep or remove packs (keeping packs still blocks achievements on modern Bedrock)
-- **Interactive menu** — lists all local worlds (`%AppData%\Minecraft Bedrock\Users\*\games\com.mojang\minecraftWorlds`), shows `BLOCKED / OK` status and pack count
+- **Interactive menu** — lists all local worlds (`%AppData%\Minecraft Bedrock\Users\*\games\com.mojang\minecraftWorlds`), shows `BLOCKED / OK` status and pack count; stays in menu until you type `Quit`
+- **Manual / any drive** — choose `[M] Manual path` and paste a world folder, `level.dat`, `.mcworld` or `.zip` from any drive (e.g. `D:\MyWorld`, `E:\backup.mcworld`) or just drag & drop the file onto the EXE
 - **Batch mode** — `0` reactivates every world at once, or pass paths as args / drag & drop `.mcworld` / `level.dat`
 - **Safe** — creates `level.dat.bak` and `world_behavior_packs.json.bak` on first run; never overwrites existing backups
 
@@ -50,6 +51,7 @@ py -3 reativar_conquistas.py "C:\...\minecraftWorlds\My World"
 1. Close Minecraft completely
 2. Double-click `dist\HeartzinUnlocker.exe`
 3. Choose world number (`0` for all) → if packs detected, choose `y` to remove them → Enter
+4. Or choose `[M] Manual path` and paste a world from another drive, e.g. `D:\Games\Minecraft\MyWorld` or drag & drop a `.mcworld` onto the EXE
 
 ## How it works
 
