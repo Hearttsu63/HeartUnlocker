@@ -1,4 +1,4 @@
-# HeartzinUnlocker — Bedrock Achievement Reactivator
+# Heart Unlocker — Bedrock Achievement Reactivator
 
 **Restore achievements on Minecraft Bedrock worlds that used cheats, Creative mode or Behavior Packs — without losing your world.**
 
@@ -25,7 +25,7 @@ Based on [058f9cf1/minecraft_bedrock_reenable_achievements](https://github.com/0
   ```powershell
   py -3 -m pip install amulet-nbt amulet-core
   ```
-- Or just use the standalone `HeartzinUnlocker.exe` in `dist/` (no Python needed)
+- Or just use the standalone `HeartUnlocker.exe` in `dist/` (no Python needed)
 
 ## Quick Start
 
@@ -36,20 +36,22 @@ Based on [058f9cf1/minecraft_bedrock_reenable_achievements](https://github.com/0
 py -3 -m pip install git+https://github.com/Hearttsu63/HeartzinUnlocker.git
 
 # run
-heartzin-unlocker
+heart-unlocker
 # or
+py -3 -m heart_unlocker
+# legacy
 py -3 -m reativar_conquistas
 
 # force remove packs:
-py -3 -m heartzin_unlocker --remove-packs
+heart-unlocker --remove-packs
 # single world / drag & drop:
-py -3 reativar_conquistas.py "C:\...\minecraftWorlds\My World"
+heart-unlocker "C:\...\minecraftWorlds\My World"
 ```
 
 ### Option B — EXE (no Python needed)
 
 1. Close Minecraft completely
-2. Double-click `dist\HeartzinUnlocker.exe`
+2. Double-click `dist\HeartUnlocker.exe`
 3. Choose world number (`0` for all) → if packs detected, choose `y` to remove them → Enter
 4. Or choose `[M] Manual path` and paste a world from another drive, e.g. `D:\Games\Minecraft\MyWorld` or drag & drop a `.mcworld` onto the EXE
 

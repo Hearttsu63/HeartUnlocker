@@ -3,9 +3,9 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "heartzin-unlocker"
+name = "heart-unlocker"
 version = "2.2.1"
-description = "Bedrock Achievement Reactivator by @Heartzin"
+description = "Bedrock Achievement Reactivator by @Heartzin - Heart Unlocker"
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = ["amulet-nbt", "amulet-core"]
@@ -14,11 +14,12 @@ authors = [{ name = "Heartzin", email = "heartzin@telegram.me" }]
 keywords = ["minecraft", "bedrock", "achievements"]
 
 [project.scripts]
-heartzin-unlocker = "reativar_conquistas:main"
+heart-unlocker = "heart_unlocker:main"
+heartzin-unlocker = "heart_unlocker:main"
 
 [project.urls]
 Homepage = "https://github.com/Hearttsu63/HeartzinUnlocker"
 Repository = "https://github.com/Hearttsu63/HeartzinUnlocker"
 
 [tool.setuptools]
-py-modules = ["reativar_conquistas"]
+py-modules = ["reativar_conquistas", "heart_unlocker"]
