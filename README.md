@@ -33,7 +33,7 @@ Based on [058f9cf1/minecraft_bedrock_reenable_achievements](https://github.com/0
 
 ```powershell
 # install directly from GitHub
-py -3 -m pip install git+https://github.com/Hearttsu63/HeartzinUnlocker.git
+py -3 -m pip install git+https://github.com/Hearttsu63/HeartUnlocker.git
 
 # run
 heart-unlocker
@@ -52,7 +52,7 @@ py -3 -m heart_unlocker
 ```bash
 pkg update && pkg install python git -y
 pip install amulet-nbt amulet-core
-pip install git+https://github.com/Hearttsu63/HeartzinUnlocker.git
+pip install git+https://github.com/Hearttsu63/HeartUnlocker.git
 termux-setup-storage
 heart-unlocker
 # then choose [M] Manual path and paste:

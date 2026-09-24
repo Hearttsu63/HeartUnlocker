@@ -18,8 +18,8 @@ heart-unlocker = "heart_unlocker:main"
 heartzin-unlocker = "heart_unlocker:main"
 
 [project.urls]
-Homepage = "https://github.com/Hearttsu63/HeartzinUnlocker"
-Repository = "https://github.com/Hearttsu63/HeartzinUnlocker"
+Homepage = "https://github.com/Hearttsu63/HeartUnlocker"
+Repository = "https://github.com/Hearttsu63/HeartUnlocker"
 
 [tool.setuptools]
 py-modules = ["reativar_conquistas", "heart_unlocker"]
