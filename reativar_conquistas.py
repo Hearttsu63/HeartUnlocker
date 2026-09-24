@@ -58,13 +58,14 @@ def cyber_box(text, color=Colors.GREEN):
 
 def print_banner():
     art = r"""
-  _   _ _____   _    ____ _____  _   _ _   _ _     ___   ____ _  __ _____ ____
- | | | | ____| / \  |  _ \_   _|| | | | \ | | |   / _ \ / ___| |/ /| ____|  _ \
- | |_| |  _|  / _ \ | | | || |  | | | |  \| | |  | | | | |   | ' / |  _| | |_) |
- |  _  | |___ / ___ \| |_| || |  | |_| | |\  | |__| |_| | |___| . \ | |___|  _ <
- |_| |_|_____/_/   \_|____||_|   \___/|_| \_|_____\___/ \____|_|\_\_____|_| \_\
+ 8   8                             8   8
+ 8   8 eeee eeeee eeeee eeeee      8   8 eeeee e     eeeee eeee e   e  eeee eeeee
+ 8eee8 8    8   8 8   8   8        8e  8 8   8 8     8  88 8  8 8   8  8    8   8
+ 88  8 8eee 8eee8 8eee8e  8e  eeee 88  8 8e  8 8e    8   8 8e   8eee8e 8eee 8eee8e
+ 88  8 88   88  8 88   8  88       88  8 88  8 88    8   8 88   88   8 88   88   8
+ 88  8 88ee 88  8 88   8  88       88ee8 88  8 88eee 8eee8 88e8 88   8 88ee 88   8
 """
-    banner = f"{Colors.GREEN}{Colors.BOLD}{art}{Colors.RESET}{Colors.GREEN}                    ◆  CYBERPUNK GREEN EDITION  ◆{Colors.RESET}\n{Colors.DIM}              [  BEDROCK ACHIEVEMENT REACTIVATOR  ]{Colors.RESET}\n{Colors.DIM}              Credits: @Heartzin  |  t.me/Heartzin{Colors.RESET}\n"
+    banner = f"{Colors.GREEN}{Colors.BOLD}{art}{Colors.RESET}{Colors.DIM}              [  BEDROCK ACHIEVEMENT REACTIVATOR  ]{Colors.RESET}\n{Colors.DIM}              Credits: @Heartzin  |  t.me/Heartzin{Colors.RESET}\n"
     print(banner)
 
 def patch_level_dat(level_path: pathlib.Path, remove_packs=False):
