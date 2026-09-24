@@ -21,8 +21,10 @@ Based on [058f9cf1/minecraft_bedrock_reenable_achievements](https://github.com/0
 ## Requirements
 
 - Windows 10/11 + Minecraft for Windows (Bedrock)
-- Python 3.8+ with `amulet-nbt` and `amulet-core`:
+- Python 3.8+ — install from https://www.python.org/downloads/ or via `winget install Python.Python.3.12` (check **Add python.exe to PATH** during install), then:
   ```powershell
+  py -3 --version  # should show Python 3.8+
+  py -3 -m pip install --upgrade pip
   py -3 -m pip install amulet-nbt amulet-core
   ```
 - Or just use the standalone `HeartUnlocker.exe` in `dist/` (no Python needed)
