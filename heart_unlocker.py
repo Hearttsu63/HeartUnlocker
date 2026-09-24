@@ -104,7 +104,7 @@ def print_banner():
  █▀▓ ▓▀  █▀▓ ▓▀▄  ▓░      █ ▓ █  ▓ ▓░  █ ▓ ▓░  ▓▀▄ ▓▀  ▓▀▄
  ▀ ▀ ▀▀▀ ▀ ▀ ▀ ▀  ▀       ▀▀▀ ▀  ▀ ▀▀▀ ▀▀▀ ▀▀▀ ▀ ▀ ▀▀▀ ▀ ▀
 """
-    banner = f"{Colors.GREEN}{Colors.BOLD}{art}{Colors.RESET}{Colors.DIM}              [  BEDROCK ACHIEVEMENT REACTIVATOR  ]{Colors.RESET}\n{Colors.DIM}              Credits: @Heartzin  |  t.me/Heartzin  |  github.com/Hearttsu63{Colors.RESET}\n"
+    banner = f"{Colors.GREEN}{Colors.BOLD}{art}{Colors.RESET}{Colors.DIM}              [  BEDROCK ACHIEVEMENT REACTIVATOR  ]{Colors.RESET}\n{Colors.DIM}              Credits: @Heartzin  |  t.me/Heartzin{Colors.RESET}\n{Colors.DIM}              GitHub: github.com/Hearttsu63{Colors.RESET}\n"
     print(banner)
 
 def patch_level_dat(level_path: pathlib.Path, remove_packs=False):
