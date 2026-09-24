@@ -13,6 +13,48 @@ if sys.platform == 'win32':
 
 WORLDS_ROOT = pathlib.Path.home() / "AppData/Roaming/Minecraft Bedrock/Users"
 
+def get_possible_roots():
+    roots=[]
+    # Windows default (C:)
+    roots.append(WORLDS_ROOT)
+    if os.name == "nt":
+        # scan all drives for alternative locations (D:, E:, etc.)
+        for c in range(65, 91):
+            drive = pathlib.Path(f"{chr(c)}:/")
+            try:
+                if not drive.exists(): continue
+            except: continue
+            for cand in [
+                drive / "games/com.mojang/minecraftWorlds",
+                drive / "Minecraft Bedrock/Users",
+                drive / "Minecraft Bedrock/games/com.mojang/minecraftWorlds",
+            ]:
+                try:
+                    if cand.exists() and cand not in roots:
+                        roots.append(cand)
+                except: pass
+        # also check common custom location: %AppData% on other drives via USERPROFILE
+        for env in ["APPDATA", "LOCALAPPDATA"]:
+            p=os.environ.get(env)
+            if p:
+                cand=pathlib.Path(p).parent / "Minecraft Bedrock/Users"
+                if cand.exists() and cand not in roots:
+                    roots.append(cand)
+    else:
+        # Termux / Android / Linux
+        for cand in [
+            pathlib.Path("/storage/emulated/0/games/com.mojang/minecraftWorlds"),
+            pathlib.Path("/storage/emulated/0/Android/data/com.mojang.minecraftpe/files/games/com.mojang/minecraftWorlds"),
+            pathlib.Path.home() / "storage/shared/games/com.mojang/minecraftWorlds",
+            pathlib.Path("/data/data/com.mojang.minecraftpe/files/games/com.mojang/minecraftWorlds"),
+            pathlib.Path.home() / "games/com.mojang/minecraftWorlds",
+        ]:
+            try:
+                if cand.exists() and cand not in roots:
+                    roots.append(cand)
+            except: pass
+    return roots
+
 FLAGS_BYTE = [
     "cheatsEnabled",
     "commandsEnabled",
@@ -126,15 +168,46 @@ def patch_level_dat(level_path: pathlib.Path, remove_packs=False):
 
 def listar_mundos():
     mundos=[]
-    if not WORLDS_ROOT.exists(): return []
-    for user in WORLDS_ROOT.iterdir():
-        if not user.is_dir(): continue
-        mp=user/"games/com.mojang/minecraftWorlds"
-        if not mp.is_dir(): continue
-        for w in mp.iterdir():
-            if w.is_dir() and (w/"level.dat").exists():
-                mundos.append(w)
-    mundos.sort()
+    seen=set()
+    for root in get_possible_roots():
+        try:
+            if not root.exists(): continue
+        except: continue
+        # direct minecraftWorlds folder (Termux / any drive)
+        if root.name == "minecraftWorlds":
+            try:
+                for w in root.iterdir():
+                    if w.is_dir() and (w/"level.dat").exists():
+                        rp=str(w.resolve())
+                        if rp not in seen:
+                            seen.add(rp); mundos.append(w)
+            except: pass
+            continue
+        # Users folder (Windows)
+        if root.name == "Users":
+            try:
+                for user in root.iterdir():
+                    if not user.is_dir(): continue
+                    mp=user/"games/com.mojang/minecraftWorlds"
+                    if not mp.is_dir(): continue
+                    for w in mp.iterdir():
+                        if w.is_dir() and (w/"level.dat").exists():
+                            rp=str(w.resolve())
+                            if rp not in seen:
+                                seen.add(rp); mundos.append(w)
+            except: pass
+            continue
+        # fallback: search for minecraftWorlds under this root
+        try:
+            for mp in root.rglob("minecraftWorlds"):
+                if not mp.is_dir(): continue
+                for w in mp.iterdir():
+                    if w.is_dir() and (w/"level.dat").exists():
+                        rp=str(w.resolve())
+                        if rp not in seen:
+                            seen.add(rp); mundos.append(w)
+        except: pass
+    mundos.sort(key=lambda p: str(p).lower())
     return mundos
 
 def mundo_info(w: pathlib.Path):
