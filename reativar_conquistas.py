@@ -100,12 +100,9 @@ def cyber_box(text, color=Colors.GREEN):
 
 def print_banner():
     art = r"""
- 8   8                             8   8
- 8   8 eeee eeeee eeeee eeeee      8   8 eeeee e     eeeee eeee e   e  eeee eeeee
- 8eee8 8    8   8 8   8   8        8e  8 8   8 8     8  88 8  8 8   8  8    8   8
- 88  8 8eee 8eee8 8eee8e  8e  eeee 88  8 8e  8 8e    8   8 8e   8eee8e 8eee 8eee8e
- 88  8 88   88  8 88   8  88       88  8 88  8 88    8   8 88   88   8 88   88   8
- 88  8 88ee 88  8 88   8  88       88ee8 88  8 88eee 8eee8 88e8 88   8 88ee 88   8
+ █ █ █▀▀ █▀█ █▀█ ▀█▀      █ █ █▀▄█ █   █▀█ █▀▀ █ █ █▀▀ █▀█
+ █▀▓ ▓▀  █▀▓ ▓▀▄  ▓░      █ ▓ █  ▓ ▓░  █ ▓ ▓░  ▓▀▄ ▓▀  ▓▀▄
+ ▀ ▀ ▀▀▀ ▀ ▀ ▀ ▀  ▀       ▀▀▀ ▀  ▀ ▀▀▀ ▀▀▀ ▀▀▀ ▀ ▀ ▀▀▀ ▀ ▀
 """
     banner = f"{Colors.GREEN}{Colors.BOLD}{art}{Colors.RESET}{Colors.DIM}              [  BEDROCK ACHIEVEMENT REACTIVATOR  ]{Colors.RESET}\n{Colors.DIM}              Credits: @Heartzin  |  t.me/Heartzin{Colors.RESET}\n"
     print(banner)
